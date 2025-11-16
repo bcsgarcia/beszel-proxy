@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  beszel-proxy:
+    build: .
+    container_name: beszel-proxy
+    restart: unless-stopped
+    ports:
+      - "8091:8091"
+    environment:
+      - BESZEL_URL=${BESZEL_URL}
+      - BESZEL_EMAIL=${BESZEL_EMAIL}
+      - BESZEL_PASSWORD=${BESZEL_PASSWORD}
+      - HIDE_KERNEL=${HIDE_KERNEL:-false}
+      - HIDE_UPTIME=${HIDE_UPTIME:-false}
+      - HIDE_CPU_INFO=${HIDE_CPU_INFO:-false}
+      - HIDE_IP=${HIDE_IP:-false}
+      - OPEN_IN_NEW_TAB=${OPEN_IN_NEW_TAB:-false}
+    env_file:
+      - .env
+    networks:
+      - beszel-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8091/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  beszel-network:
+    driver: bridge
